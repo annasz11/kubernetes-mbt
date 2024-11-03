@@ -1,0 +1,111 @@
+\documentclass[main.tex]{subfiles}
+\begin{document}
+
+Kubernetes, also known as k8s, is an open-source platform for automating the deployment, scaling, and management of containerized applications \cite{kubernetes-main}. Originally developed by Google and now maintained by the Cloud Native Computing Foundation, Kubernetes has become a critical tool in modern software infrastructure, allowing organizations to manage large-scale, distributed applications with resilience and efficiency.
+
+Kubernetes provides tools to orchestrate containers, enabling developers to focus on code rather than managing infrastructure. By automating tasks like deployment, scaling, and fault-tolerance, Kubernetes allows applications to run reliably in clusters across multiple machines, improving scalability and resilience.
+
+\subsection{Core Concepts and Components}
+
+\paragraph{Clusters}
+A Kubernetes cluster is a collection of machines, or nodes, managed as a single unit. This structure allows workloads to be distributed and balanced across multiple nodes, providing high availability and fault tolerance. Clusters can include physical servers, virtual machines, or cloud-based resources.
+
+\paragraph{Nodes}
+Each cluster consists of nodes, which are individual machines where applications run. There are two main types of nodes:
+
+\begin{itemize}
+    \item Control Plane: This node manages the cluster and coordinates tasks, ensuring that desired states are met. It contains several components:
+        \begin{itemize}
+            \item API Server: The API Server serves as the gateway for communication with Kubernetes. It provides a RESTful interface where users and automated tools interact with the cluster.
+            \item Controller Manager: Ensures that the current state matches the desired state by monitoring resources and managing replication, scaling, and health checks.
+            \item Scheduler: Assigns workloads (Pods) to nodes based on resource needs and availability.
+            \item etcd: A distributed key-value store that Kubernetes uses to store all data related to the cluster, including configuration and state.
+        \end{itemize}
+    \item Worker Nodes: These nodes handle application workloads and contain the actual running containers managed by Kubernetes.
+\end{itemize}
+
+
+\subsection{Kubernetes Objects}
+Kubernetes uses objects to represent and manage resources. Some core Kubernetes objects include:
+
+\paragraph{Pods}
+A Pod is the smallest deployable unit in Kubernetes and represents one or more containers that share networking and storage resources \cite{kubernetes-pods}. Pods encapsulate the application container(s), along with networking configurations, and serve as the basic building block for Kubernetes applications. Each Pod follows a distinct lifecycle, and its state depends on the type of workload it is associated with. Here are the main states that a Pod can transition through:
+
+\begin{itemize}
+\item \textbf{Pending}: This is the initial state when a Pod has been created but is not yet running on any node. The Pod remains in the \texttt{Pending} state while waiting for the Kubernetes Scheduler to assign it to a node based on available resources and other constraints. Once assigned, the Pod will transition to \texttt{Running} if all initial setup checks are successful.
+
+\item \textbf{Running}: In this state, the Pod has been scheduled to a node, and at least one of its containers is active and operational. 
+\begin{itemize}
+    \item For \textbf{Deployments} and other long-running workloads, Pods in the \texttt{Running} state are expected to remain active and available for the duration of the Deployment. The Deployment controller ensures that if a Pod in \texttt{Running} fails, it will be automatically restarted or replaced to meet the desired replica count.
+    \item For \textbf{Jobs} and \textbf{CronJobs}, the \texttt{Running} state is typically temporary and ends when the task completes. 
+\end{itemize}
+
+\item \textbf{Succeeded}: This is a terminal state indicating that the Pod has successfully completed its task. This state primarily applies to Pods created by Jobs, where the containers within the Pod have exited successfully without any errors. Pods in the \texttt{Succeeded} state are not restarted by Kubernetes.
+
+\item \textbf{Failed}: This terminal state indicates that one or more containers in the Pod have exited due to errors or failures. Like \texttt{Succeeded}, \texttt{Failed} primarily applies to Job-related Pods, which will not restart once they reach this state. However, for Pods managed by Deployments, a failure typically results in the Pod being replaced or restarted to maintain availability.
+
+\item \textbf{Terminating}: The \texttt{Terminating} state represents the phase when a Pod is in the process of shutting down. This state can apply to both Deployment and Job Pods and is triggered by a user action (such as \texttt{kubectl delete pod}) or by the Kubernetes system when scaling down a Deployment. While in \texttt{Terminating}, Kubernetes stops all running containers and removes the Pod from the node.
+\end{itemize}
+
+In addition to these main states, our testing will also involve examining other transient states such as \texttt{CrashLoopBackOff} and \texttt{ImagePullBackOff}, which reflect specific issues encountered during the Pod lifecycle.
+
+
+
+\paragraph{Deployments}
+A Deployment is a higher-level controller that manages Pods, ensuring they are available, up-to-date, and replicable. Deployments automate scaling, updates, and rollbacks, making it easy to manage multiple instances of an application.
+
+\paragraph{Services}
+Kubernetes Services provide stable endpoints to Pods, enabling consistent access even as Pods are created or terminated. Key service types include:
+\begin{itemize}
+\item ClusterIP: Only accessible within the cluster.
+\item NodePort: Opens a specific port on each node to make the service accessible outside the cluster.
+\item LoadBalancer: Integrates with cloud provider load balancers for external access.
+\end{itemize}
+
+\paragraph{ConfigMaps and Secrets}
+ConfigMaps store non-sensitive data configurations, such as environment variables, that can be injected into Pods.
+Secrets provide a way to store sensitive information, like passwords and API keys, which are kept encrypted and secure.
+
+\paragraph{Namespaces}
+Namespaces create isolated virtual clusters within a single physical cluster. This feature is essential for large projects, providing logical separation and access control.
+
+\subsection{Workloads and Scaling}
+\paragraph{ReplicaSets}
+A ReplicaSet ensures a specified number of Pod replicas are running at all times, improving availability and fault tolerance. If a Pod crashes, the ReplicaSet automatically recreates it to maintain the desired number.
+
+\paragraph{Horizontal Pod Autoscaling}
+Kubernetes supports autoscaling to adjust the number of Pods dynamically based on metrics such as CPU or memory usage. This feature allows applications to scale up during high demand and scale down to save resources during low demand.
+
+
+\subsection{Kubernetes API and kubectl}
+\paragraph{Kubernetes API}
+The Kubernetes API is the central interface for interacting with the cluster \cite{kubernetes-api}. Every action within Kubernetes—creating, modifying, or deleting resources—goes through the API. Users can programmatically manage resources by sending HTTP requests to the API, which serves as the cluster’s command center.
+
+\paragraph{kubectl}
+\texttt{kubectl} is Kubernetes' command-line tool that allows users to interact with the cluster \cite{kubernetes-kubectl}. It’s essential for managing, inspecting, and troubleshooting Kubernetes resources. Commands issued by kubectl are translated into HTTP requests to the API, which then processes these requests.
+Examples of basic commands include:
+\begin{itemize}
+    \item \texttt{kubectl get pods -n <namespace>}: Lists Pods in a namespace or cluster-wide. It translates to  \texttt{GET /api/v1/namespaces/\{namespace\}/pods/}. 
+    \item \texttt{kubectl apply -f <file>.yaml}: Applies a configuration to create or update a resource. It translates to \texttt{POST /api/v1/namespaces/\{namespace\}/pods}.
+    \item \texttt{kubectl delete pod <pod-name>}: Deletes a specified Pod from the cluster. It translates to \texttt{DELETE /api/v1/namespaces/\{namespace\}/pods/\{name\}}
+\end{itemize}
+
+
+\subsection{Kubernetes Architecture for Resilience and Fault Tolerance}
+Kubernetes is designed to keep applications available and stable even during failures or changes in demand.
+
+\paragraph{Self-Healing}
+Kubernetes continuously monitors the health of Pods, restarting containers that fail unexpectedly to maintain the system's desired state.
+
+\paragraph{Load Balancing}
+Kubernetes Services balance traffic across Pods, distributing requests to ensure reliability and performance.
+
+\paragraph{Rolling Updates and Rollbacks}
+Kubernetes Deployments support rolling updates to introduce new changes with minimal disruption. If an update causes issues, Kubernetes can perform a rollback to revert to a previous, stable version.
+
+\subsection{Readiness Probe}
+A readiness probe is a mechanism in Kubernetes that determines whether a Pod's container is ready to accept traffic. This probe can be configured with various parameters, including the initial delay before the first check, the frequency of subsequent checks, and the criteria for determining success or failure. This configuration allows Kubernetes to manage the Pod's availability effectively by ensuring that only ready Pods receive traffic.
+
+
+
+\end{document}

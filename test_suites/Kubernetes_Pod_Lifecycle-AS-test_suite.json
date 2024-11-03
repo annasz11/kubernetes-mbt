@@ -1,0 +1,47 @@
+{
+    "test_suite": {
+        "name": "Kubernetes_Pod_Lifecycle",
+        "id": "d4b3d5c2-8e4e-4b47-a36b-b2f7aab7e7d6",
+        "method": "AS",
+        "input_list": [
+            "create_pod",
+            "image_pull_success",
+            "delete_pod",
+            "clean_up",
+            "create_pod",
+            "image_pull_error",
+            "image_pull_success",
+            "containers_ready",
+            "rediness_probe_success",
+            "one_container_failed",
+            "delete_pod",
+            "create_pod",
+            "image_pull_success",
+            "containers_ready",
+            "container_terminated",
+            "timeout",
+            "rediness_probe_success",
+            "containers_exited_succ"
+        ],
+        "output_list": [
+            "Pending",
+            "ContainerCreating",
+            "Terminating",
+            "PodNotExists",
+            "Pending",
+            "ImagePullBackOff",
+            "ContainerCreating",
+            "Running_NotReady",
+            "Running_Ready",
+            "Failed",
+            "PodNotExists",
+            "Pending",
+            "ContainerCreating",
+            "Running_NotReady",
+            "CrashLoopBackOff",
+            "Running_NotReady",
+            "Running_Ready",
+            "Succeeded"
+        ]
+    }
+}

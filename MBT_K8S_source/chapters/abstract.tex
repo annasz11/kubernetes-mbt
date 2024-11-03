@@ -1,0 +1,15 @@
+\documentclass[main.tex]{subfiles}
+\begin{document}
+
+This document describes the automated testing of Kubernetes Pod lifecycle management using a model-based testing (MBT) approach. To represent the lifecycle states and the transitions of Kubernetes Pods, a finite state machine (FSM) model was developed using Graphwalker. For test generation based on the model, the ModelTestRelax (MTR) framework was used. All of the files in connection with this project can be found under this repository: \url{https://github.com/annasz11/kubernetes-mbt}. 
+
+The testing environment was set up on Minikube, with \texttt{kubectl} serving as the primary command-line tool to interact with the Kubernetes API. Adaptation code written in Python was integrated to translate generated test cases into actual commands executed on the Kubernetes cluster, bridging the gap between model-based tests and real-world execution.
+
+The document covers the following areas:
+\begin{itemize}
+    \item \textbf{Introduction to Kubernetes}: A foundational overview of Kubernetes and its architecture, including critical components that facilitate container orchestration, such as the API server, nodes, Pods, and control plane.
+    \item \textbf{Tested Features of Kubernetes}: Detailed analysis of each Pod lifecycle state, explaining how they can be tested. Specific attention is given to interaction patterns with \texttt{kubectl} and the API server, with UML diagrams illustrating key transitions.
+    \item \textbf{Test Generation with MTR}: A discussion on how tests are generated using Model-based Testing (MBT) with the MTR tool, demonstrating how the FSM model translates into executable test cases.
+    \item \textbf{Adaptation Code and Test Execution}: This section describes the adaptation code used to interface with Kubernetes, as well as the process of executing and evaluating the tests in a live Kubernetes environment.
+\end{itemize}
+\end{document}
