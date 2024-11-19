@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pod
+spec:
+  terminationGracePeriodSeconds: 2
+  containers:
+    - name: nginx
+      image: nginx
+      ports:
+        - containerPort: 80
+      livenessProbe:
+        exec:
+          command:
+            - "true"
+        initialDelaySeconds: 2
+        periodSeconds: 2
+
+      readinessProbe:
+        exec:
+          command:
+            - "true"
+        initialDelaySeconds: 5
+        periodSeconds: 2
+      command: [ "exit", "1" ]
+  restartPolicy: Never
