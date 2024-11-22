@@ -1,6 +1,9 @@
+package test_runners;
+
 import input_executors.*;
 import output_mapper.*;
 import utils.KubectlUtils;
+import utils.TestSuite;
 import utils.Utils;
 
 import java.io.FileNotFoundException;
@@ -44,6 +47,7 @@ public class TestRunner {
     }
 
     public void runTestSuite(TestSuite testSuite) throws FileNotFoundException, URISyntaxException, InterruptedException {
+        long startTime = System.currentTimeMillis();
         boolean allTestPassed = true;
         boolean currentResult;
 
@@ -81,7 +85,9 @@ public class TestRunner {
             allTestPassed = allTestPassed && currentResult;
         }
 
+        long endTime = System.currentTimeMillis();
         System.out.println("\n");
+        System.out.println(STR."Elapsed time: \{(endTime-startTime)/1000} s");
         if (allTestPassed) {
             System.out.println("All test passed!\n\n");
         } else {

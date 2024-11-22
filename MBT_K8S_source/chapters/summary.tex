@@ -1,0 +1,6 @@
+\documentclass[main.tex]{subfiles}
+\begin{document}
+In this study, the Kubernetes Pod lifecycle management process was tested where an FSM model was created and the MTR model-based testing tool was used. The FSM captured the extended states and transitions of the Pod lifecycle, enabling a model-based approach to test generation. Various algorithms were employed to generate test suites, including Random Walk, All-State, Transition Tour, All-Transition-State, and N-Switch Coverage, each offering distinct trade-offs between coverage, test sequence length, and generation time.
+
+The generated test suites were executed using a Java-based adaptation code that interacted directly with the Kubernetes cluster via kubectl. This approach allowed precise control over pod states and transitions, ensuring alignment between the model and the actual system under test. During execution, the adaptation code successfully applied all test cases without encountering any faults, indicating that the Kubernetes pod lifecycle management implementation adhered to the expected behavior defined in the FSM model.
+\end{document}

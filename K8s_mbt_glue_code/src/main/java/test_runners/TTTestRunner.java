@@ -1,3 +1,7 @@
+package test_runners;
+
+import utils.JsonTestSuiteProcessor;
+import utils.TestSuite;
 import utils.Utils;
 
 public class TTTestRunner {
