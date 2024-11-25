@@ -6,7 +6,7 @@ For test generation, the ModelTestRelax(MTR,  Version: 3.5.16) framework \cite{m
 \subsection{Random Walk}
 ThE Random Walk algorithm starts at an initial state and randomly selects a transition from the current state at each step. It stops when a specified condition is met, such as a percentage of states or transitions visited. While this method is useful for exploratory testing, it may generate longer test sequences than necessary for functional testing of complex systems. The algorithm supports FSMs and EFSMs, with an optional flag to include reset transitions in the coverage.
 
-\subsubsection{Execution and Parameters}
+\subsubsection*{Execution and Parameters}
 The algorithm is executed using the following parameters:
 \begin{itemize}
     \item Coverage type: States or transitions.
@@ -14,7 +14,7 @@ The algorithm is executed using the following parameters:
     \item Reset transitions: Optionally include reset transitions in coverage calculations.
 \end{itemize}
 
-\subsubsection{Results}
+\subsubsection*{Results}
 For this analysis, \textit{Random Walk} was run with 100\% state and transition coverage and also with 75\% state and transition coverage as the stop condition. The last one was repeated five times to account for variability in sequence length and coverage.
 
 \textbf{Results:} After running the Random walk(75\% transition coverage) 5 times, the following statistics can be made.
@@ -47,7 +47,7 @@ The All-State algorithm generates a test sequence that ensures every state in a 
     \item Sequence length: $O(m)$, where $m$ is the number of transitions.
 \end{itemize}
 
-\subsubsection{Execution and Parameters}
+\subsubsection*{Execution and Parameters}
 No additional parameters are required for FSMs, but the \texttt{--consider\_reset\_transitions} flag can be used for including reset transitions.
 The following figure is an example run on the FSM model.
 \begin{figure}[H]
@@ -69,7 +69,7 @@ The following figure is an example run on the FSM model.
     \label{fig:all_state}
 \end{figure}
 
-\subsubsection{Directed Chinese Postman}
+\subsection{Directed Chinese Postman}
 An extension of the Transition Tour, this algorithm considers transition costs too. It adjusts the test sequence by minimizing duplication costs while achieving the same coverage and complexity as Transition Tour. If transition costs are uniform, the sequences generated are identical to those of Transition Tour.
 The use of this algorithm turned out to be useful when writing the adaptation code, where it became clear that some transitons like the clean up process or the image pulling take much longer time than others. So the previous FSM model was extended with costs and then the DCP could be run on it:
 
