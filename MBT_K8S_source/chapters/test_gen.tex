@@ -4,13 +4,7 @@
 For test generation, the ModelTestRelax(MTR,  Version: 3.5.16) framework \cite{mtr} was used with different parameters.
 
 \subsection{Random Walk}
-The \textit{Random Walk} algorithm generates a test sequence by randomly selecting a transition from the current state at each step. This process continues until one of the specified stop conditions is met. The algorithm supports two stop conditions:
-\begin{itemize}
-    \item A given percentage of states has been visited.
-    \item A given percentage of transitions has been covered.
-\end{itemize}
-
-While \textit{Random Walk} is useful for exploratory testing, it is less efficient for systematic functional testing of large models due to its potentially long test sequences. However, its randomness makes it suitable for uncovering unexpected behaviors.
+ThE Random Walk algorithm starts at an initial state and randomly selects a transition from the current state at each step. It stops when a specified condition is met, such as a percentage of states or transitions visited. While this method is useful for exploratory testing, it may generate longer test sequences than necessary for functional testing of complex systems. The algorithm supports FSMs and EFSMs, with an optional flag to include reset transitions in the coverage.
 
 \subsubsection{Execution and Parameters}
 The algorithm is executed using the following parameters:
@@ -30,39 +24,21 @@ For this analysis, \textit{Random Walk} was run with 100\% state and transition 
 \hline
  & \textbf{Test Generation Time} & \textbf{Test Sequence Length} & \textbf{Reached coverage} \\ \hline
 1 & 0.001434 s & 264 & 77.42\% \\ \hline
-2 & 0.000823 s & 41 & 80\% \\ \hline
+2 & 0.0009943 s & 72 & 77.42\% \\ \hline
 3 & 0.0008907 s & 58 & 77.42\% \\ \hline
 4 & 0.0010825 s & 75 & 77.42\% \\ \hline
 5 & 0.0008158 s & 88 & 77.42\% \\ \hline
-\textbf{Average} & \textbf{0,0010092 s} & \textbf{105} & \textbf{77.94\%} \\ \hline
+\textbf{Average} & \textbf{0.00104346
+ s} & \textbf{111.4} & \textbf{77.42\%} \\ \hline
 \end{tabular}
 \caption{Summary of Random Walk Algorithm (5 Runs)}
 \label{table:random_walk_summary}
 \end{table}
-Here we can see that there was one case (namely the first one) where it took much longer time and test sequence to reach the desired coverage or exceed it, which was 77.42\%. This value then was coming up 4 out of 5 times overall. The outstanding long first run is not that surprising since it is a randomized algorithm, if it "chooses worng" multiple times, it will finish later.
+Here we can see that there was one case (namely the first one) where it took much longer time and test sequence to reach the desired coverage or exceed it, which was 77.42\% all of the cases.  The outstanding long first run is not that surprising since it is a randomized algorithm, if it "chooses worng" multiple times, it will finish later.
 
-\subsection{Transition Tour}
-
-The \textit{Transition Tour} (TT) algorithm is designed to generate the shortest possible test sequence that ensures every transition in a reduced, deterministic, and strongly connected FSM is visited at least once, and returning to the initial state. This approach guarantees full state and transition coverage, making it particularly effective for detecting output faults, though it may not uncover all transfer faults.
-
-The process involves two main stages: 
-\begin{enumerate} 
-\item Graph Adjustment: The FSM graph is transformed into an Eulerian graph by duplicating certain transitions to balance the number of incoming and outgoing arcs for each state. This step relies on solving a minimum matching problem in a bipartite graph. 
-\item Eulerian Path Construction: Using the augmented graph, an Eulerian path is determined by creating a spanning tree where edges point back toward the initial state. 
-\end{enumerate}
-
-With a time complexity of $O(n^3 + m)$ and test sequence length proportional to the number of transitions ($O(m)$), the TT algorithm offers an efficient solution for achieving comprehensive coverage in FSM-based testing.
-
-The following figure is an example run on the FSM model.
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{test_results/TT.png}
-    \caption{All-state}
-    \label{fig:all_state}
-\end{figure}
 
 \subsection{All-State}
-The \textit{All-State} algorithm aims to visit every state in the FSM at least once. Using the Nearest Neighbor heuristic, it constructs a test sequence by repeatedly selecting the shortest path to an unvisited state until all states are covered. 
+The All-State algorithm generates a test sequence that ensures every state in a deterministic, strongly connected FSM is visited at least once. It uses the Nearest Neighbor heuristic to move towards the closest unvisited state in each step. Although reset transitions can be included, guard conditions in EFSMs are ignored. 
 
 \textbf{Key Characteristics:}
 \begin{itemize}
@@ -81,48 +57,35 @@ The following figure is an example run on the FSM model.
     \label{fig:all_state}
 \end{figure}
 
-\subsection{All-Transition-State (ATS)}
-\subsubsection{Algorithm Overview}
-The \textit{All-Transition-State} (ATS) algorithm generates a test suite that meets two criteria:
-\begin{enumerate}
-    \item Each transition must be included in a sequence that reaches all FSM states.
-    \item Each state must be reachable without using a specific transition (if feasible).
-\end{enumerate}
 
-The algorithm operates in two parts:
-\begin{itemize}
-    \item Preamble: Covers all transitions using the \textit{Transition Tour} method.
-    \item Postamble: Covers all states using the Nearest Neighbor heuristic.
-\end{itemize}
+\subsection{Transition Tour}
+The Transition Tour algorithm produces a sequence covering every transition in a reduced, deterministic, strongly connected FSM, returning to the initial state afterward. It ensures 100\% state and transition coverage by solving the Directed Chinese Postman Problem, creating an Eulerian graph and finding an Euler tour. The algorithm has a time complexity of $O(n^3 + m)$ and sequence length $O(m)$. Reset transitions and Graphviz outputs are supported.
 
-ATS has three variations:
-\begin{itemize}
-    \item ATS0: Standard version.
-    \item ATSa: Iterative version with no limit.
-    \item ATSx: Iterative version with a specified limit.
-\end{itemize}
+The following figure is an example run on the FSM model.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{test_results/TT.png}
+    \caption{All-state}
+    \label{fig:all_state}
+\end{figure}
 
-\textbf{Key Characteristics:}
-\begin{itemize}
-    \item Time complexity: $O(n^3 + m)$ for ATS0; higher for iterative versions.
-    \item Sequence length: Comparable to \textit{Transition Tour}.
-\end{itemize}
+\subsubsection{Directed Chinese Postman}
+An extension of the Transition Tour, this algorithm considers transition costs too. It adjusts the test sequence by minimizing duplication costs while achieving the same coverage and complexity as Transition Tour. If transition costs are uniform, the sequences generated are identical to those of Transition Tour.
+The use of this algorithm turned out to be useful when writing the adaptation code, where it became clear that some transitons like the clean up process or the image pulling take much longer time than others. So the previous FSM model was extended with costs and then the DCP could be run on it:
 
-\subsubsection{Execution and Parameters}
-For this analysis, the standard version (ATS0) is used.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{test_results/dcp.png}
+    \caption{DCP}
+    \label{fig:all_state}
+\end{figure}
 
-\subsection{N-Switch Coverage}
-The \textit{N-Switch Coverage} algorithm generates test sequences that cover all consecutive $N+1$ transitions in the FSM. It constructs a list of all such paths, selects uncovered paths, and augments sequences as needed to achieve full coverage.
+\subsection{All-Transition-State (ATS)}The ATS algorithm ensures all transitions and states of a reduced, deterministic FSM are covered based on two criteria: every transition must lead to all states, and there must be paths to all states excluding that transition (if feasible). The algorithm includes standard and iterative versions, trading off coverage and sequence length. The standard version has a complexity of $O(n^3 + m)$, while iterative versions increase complexity based on iteration limits.
 
-\textbf{Key Characteristics:}
-\begin{itemize}
-    \item Higher $N$ values increase fault coverage but also lengthen test sequences.
-    \item Time complexity: $O((N+1) \cdot m^{N+1})$.
-    \item Sequence length: $O((N+1) \cdot m^{N+1})$.
-\end{itemize}
 
-\subsubsection{Execution and Parameters}
-For this analysis, 1-switch coverage is used as the default configuration.
+\subsection{N-Switch Coverage}  
+The N-Switch Coverage algorithm generates test sequences that cover all possible consecutive \(N+1\) transitions in the model, including loops. The parameter \(N\), set with the \texttt{--ns\_value} flag, determines the depth of coverage, allowing engineers to balance test sequence length and fault coverage. The algorithm iteratively selects uncovered transitions from an ordered list, augments sequences to cover partially completed paths, and stops when all transitions are fully covered. Additional tuning options, such as \texttt{--ns\_search\_depth}, enable optimization of test generation complexity versus sequence length. This method is well-suited for thorough testing of systems with complex state transitions, though it may require significant computational resources for large \(N\).
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{test_results/n-switch.png}
@@ -144,13 +107,14 @@ Table~\ref{tab:algorithm_comparison} summarizes the performance of the selected 
 Random Walk (100\% transition c.)     & 965     & 0.0052706 s    & 100\% transition coverage  \\ \hline
 All-State     & 18     & 0,0001648 s    & 100\% state coverage \\ \hline
 Transition Tour     & 54     & 0.0063979 s  & 100\% state- and transition coverage    \\ \hline
-All-Transition-State     & 193     & 0.0244396 s     & 100\% state- and transition coverage    \\ \hline
+DCP     & 54     &  0.0065978 s  & 100\% state- and transition coverage    \\ \hline
+All-Transition-State (standard)     & 193     & 0.0244396 s     & 100\% state- and transition coverage    \\ \hline
 N-Switch Coverage (N=1)     & 200     & 0.0125292 s     & 100\% state- and transition coverage    \\ \hline
 \end{tabular}
 \end{table}
 
 \subsection{Conclusions}
-The Random Walk (100\% transition coverage) algorithm generated the longest test sequence, consisting of 965 steps, with a moderate elapsed time of 0.00527 seconds, emphasizing complete transition coverage but at the cost of producing lengthy sequences. In contrast, the All-State algorithm created the shortest test sequence of only 18 steps and was the fastest, with an execution time of 0.000165 seconds, as it focuses solely on state coverage, resulting in minimal generation. The Transition Tour algorithm generated a moderate sequence of 54 steps but took slightly longer, with an elapsed time of 0.00640 seconds, reflecting its method of traversing transitions optimally to ensure coverage. The All-Transition-State (ATS) algorithm achieved comprehensive state and transition coverage, producing a sequence of 193 steps but with the highest elapsed time of 0.02444 seconds due to its detailed coverage requirements. Lastly, the N-Switch Coverage (N=1) algorithm provided a balance, generating a sequence of 200 steps with a reasonable elapsed time of 0.01253 seconds, focusing on transitions within a specified depth. These results demonstrate a clear trade-off between coverage, sequence length and execution time.
+The Random Walk (100\% transition coverage) algorithm generated the longest test sequence, consisting of 965 steps, with a moderate elapsed time of 0.00527 seconds, emphasizing complete transition coverage but at the cost of producing lengthy sequences. In contrast, the All-State algorithm created the shortest test sequence of only 18 steps and was the fastest, with an execution time of 0.000165 seconds, as it focuses solely on state coverage, resulting in minimal generation. The Transition Tour algorithm generated a moderate sequence of 54 steps but took slightly longer, with an elapsed time of 0.00640 seconds, reflecting its method of traversing transitions optimally to ensure coverage. DCP had the same length of the generated test sequence, which was expected, the differences will be discovered when executing the test cases. The All-Transition-State (ATS) algorithm achieved comprehensive state and transition coverage, producing a sequence of 193 steps but with the highest elapsed time of 0.02444 seconds due to its detailed coverage requirements. Lastly, the N-Switch Coverage (N=1) algorithm provided a balance, generating a sequence of 200 steps with a reasonable elapsed time of 0.01253 seconds, focusing on transitions within a specified depth. These results demonstrate a clear trade-off between coverage, sequence length and execution time.
 
 
 The generated test suites and result can be found in the github repository: \url{https://github.com/annasz11/kubernetes-mbt}.

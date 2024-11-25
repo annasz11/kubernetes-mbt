@@ -1,0 +1,23 @@
+{
+    "test_suite": {
+        "name": "Example_Use_Case1",
+        "id": "d4b3d5c2-8e4e-4b47-a36b-b2f7aab7e7d6",
+        "method": "Custom",
+        "input_list": [
+            "create_pod",
+            "image_pull_success",
+            "containers_ready",
+            "rediness_probe_success",
+            "delete_pod",
+            "clean_up"
+        ],
+        "output_list": [
+            "Pending",
+            "ContainerCreating",
+            "Running_NotReady",
+            "Running_Ready",
+            "Terminating",
+            "PodNotExists"
+        ]
+    }
+}

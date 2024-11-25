@@ -1,0 +1,15 @@
+{
+    "test_suite": {
+        "name": "Toy_train_signal",
+        "id": "08414683-68cb-4f68-be4c-670cd27f6cbe",
+        "method": "AS",
+        "input_list": [
+            "switch on",
+            "timeout(7s)"
+        ],
+        "output_list": [
+            "green",
+            "red"
+        ]
+    }
+}
